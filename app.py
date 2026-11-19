@@ -95,7 +95,11 @@ if len(selected_date_range) == 2:
     (filtered_full_data['order_date'].dt.date >= start_date) &
     (filtered_full_data['order_date'].dt.date <= end_date)
   ]
-  
+
+if len(filtered_full_data) == 0:
+  st.warning("По выбранным фильтрам нет данных")
+  st.stop()
+
 st.dataframe(filtered_full_data)
 
 #блок «Ключевые показатели»
@@ -141,7 +145,10 @@ ax.set_title("Топ-10 товаров по выручке", fontsize=28)
 ax.invert_yaxis()
 
 filtered_full_data['day_of_week'] = filtered_full_data['order_date'].dt.day_name()
-orders_by_day = filtered_full_data['day_of_week'].value_counts()
+orders_by_day = (
+  filtered_full_data.groupby('day_of_week')['order_id']
+  .nunique()
+)
 
 ru_map = {'Monday': 'Пн', 'Tuesday': 'Вт', 'Wednesday': 'Ср',
   'Thursday': 'Чт', 'Friday': 'Пт', 'Saturday': 'Сб', 'Sunday': 'Вс'
